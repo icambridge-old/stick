@@ -1,0 +1,17 @@
+{
+    "name": "icambridge/stick",
+    "type": "library",
+    "description": "Stick, template language for Hack",
+    "keywords": ["templating"],
+    "require-dev": {
+        "hackpack/hackunit": "*"
+    },
+    "config": {
+        "bin-dir": "bin/"
+    },
+    "autoload": {
+        "psr-4": {
+            "":"src/"
+        }
+    }
+}
