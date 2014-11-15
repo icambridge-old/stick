@@ -62,14 +62,16 @@ class Lexer
         $this->position++;
         $currentPosition = $this->positions[0][$this->position];
 
-
         // push the template text first
         $rawText = $text = substr($this->template, $this->cursor, $currentPosition[1] - $this->cursor);
         if (isset($this->positions[2][$this->position][0])) {
             $text = rtrim($rawText);
         }
+
         $this->pushToken(Token::TYPE_TEXT, $text);
+
         $this->moveCursor($text.$currentPosition[0]);
+
         if ($currentPosition[0] == '{%') {
           $this->pushToken(Token::TYPE_BLOCK_START);
           $this->setState(self::STATE_BLOCK);
@@ -82,9 +84,6 @@ class Lexer
           preg_match("~.*".preg_quote("#}")."~A", $this->template, $matches, null, $this->cursor);
           $this->moveCursor($matches[0]);
         }
-
-
-        return;
 
     }
 
@@ -152,6 +151,10 @@ class Lexer
 
     private function pushToken(string $type, string $text = ''): void
     {
+        if (empty($text) && Token::TYPE_TEXT == $type) {
+          return;
+        }
+
         $this->tokens[] = new Token($type, $text);
     }
 }

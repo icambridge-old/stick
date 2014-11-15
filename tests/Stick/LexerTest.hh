@@ -7,14 +7,13 @@ use HackPack\HackUnit\Core\TestCase;
 
 class LexerTest extends TestCase
 {
-    public function testTextAndEOF(): void
+    public function testEOF(): void
     {
         $template = "";
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[0]->getType())->toEqual(Token::TYPE_TEXT);
-        $this->expect($tokens[1]->getType())->toEqual(Token::TYPE_EOF);
+        $this->expect($tokens[0]->getType())->toEqual(Token::TYPE_EOF);
     }
 
     public function testReturnsTextBlock(): void
@@ -56,8 +55,8 @@ class LexerTest extends TestCase
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[2]->getType())->toEqual(Token::TYPE_NAME);
-        $this->expect($tokens[2]->getValue())->toEqual("for");
+        $this->expect($tokens[1]->getType())->toEqual(Token::TYPE_NAME);
+        $this->expect($tokens[1]->getValue())->toEqual("for");
     }
 
     public function testFindsNameTagVar(): void
@@ -66,8 +65,8 @@ class LexerTest extends TestCase
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[3]->getType())->toEqual(Token::TYPE_NAME);
-        $this->expect($tokens[3]->getValue())->toEqual("var");
+        $this->expect($tokens[2]->getType())->toEqual(Token::TYPE_NAME);
+        $this->expect($tokens[2]->getValue())->toEqual("var");
     }
 
     public function testFindsOperatorTokenIn(): void
@@ -76,8 +75,8 @@ class LexerTest extends TestCase
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[4]->getType())->toEqual(Token::TYPE_OPERATOR);
-        $this->expect($tokens[4]->getValue())->toEqual("in");
+        $this->expect($tokens[3]->getType())->toEqual(Token::TYPE_OPERATOR);
+        $this->expect($tokens[3]->getValue())->toEqual("in");
     }
 
     public function testFindsNameTokenArray(): void
@@ -86,8 +85,8 @@ class LexerTest extends TestCase
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[5]->getType())->toEqual(Token::TYPE_NAME);
-        $this->expect($tokens[5]->getValue())->toEqual("array");
+        $this->expect($tokens[4]->getType())->toEqual(Token::TYPE_NAME);
+        $this->expect($tokens[4]->getValue())->toEqual("array");
     }
 
 
@@ -97,7 +96,7 @@ class LexerTest extends TestCase
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[6]->getType())->toEqual(Token::TYPE_BLOCK_END);
+        $this->expect($tokens[5]->getType())->toEqual(Token::TYPE_BLOCK_END);
     }
 
 
@@ -107,8 +106,8 @@ class LexerTest extends TestCase
 
       $lexer = new Lexer();
       $tokens = $lexer->tokenize($template);
-      $this->expect($tokens[7]->getType())->toEqual(Token::TYPE_TEXT);
-      $this->expect($tokens[7]->getValue())->toEqual("Hello ");
+      $this->expect($tokens[6]->getType())->toEqual(Token::TYPE_TEXT);
+      $this->expect($tokens[6]->getValue())->toEqual("Hello ");
     }
 
 
@@ -118,7 +117,7 @@ class LexerTest extends TestCase
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[8]->getType())->toEqual(Token::TYPE_VARIABLE_START);
+        $this->expect($tokens[7]->getType())->toEqual(Token::TYPE_VARIABLE_START);
     }
 
 
@@ -128,8 +127,8 @@ class LexerTest extends TestCase
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[9]->getType())->toEqual(Token::TYPE_NAME);
-        $this->expect($tokens[9]->getValue())->toEqual("var");
+        $this->expect($tokens[8]->getType())->toEqual(Token::TYPE_NAME);
+        $this->expect($tokens[8]->getValue())->toEqual("var");
     }
 
 
@@ -139,7 +138,7 @@ class LexerTest extends TestCase
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[10]->getType())->toEqual(Token::TYPE_VARIABLE_END);
+        $this->expect($tokens[9]->getType())->toEqual(Token::TYPE_VARIABLE_END);
     }
 
     public function testFindsText(): void
@@ -148,18 +147,17 @@ class LexerTest extends TestCase
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[11]->getType())->toEqual(Token::TYPE_TEXT);
-        $this->expect($tokens[11]->getValue())->toEqual(" ");
+        $this->expect($tokens[10]->getType())->toEqual(Token::TYPE_TEXT);
+        $this->expect($tokens[10]->getValue())->toEqual(" ");
     }
 
     public function testReturnsStartBlockAfterText(): void
     {
-        $startString = "Hello World";
-        $template = "$startString{% for var in array %}Hello {{ var }} {% endfor %}. Whoop";
+        $template = "{% for var in array %}Hello {{ var }} {% endfor %}. Whoop";
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[12]->getType())->toEqual(Token::TYPE_BLOCK_START);
+        $this->expect($tokens[11]->getType())->toEqual(Token::TYPE_BLOCK_START);
     }
 
     public function testReturnsNameTokenEndFor(): void
@@ -200,7 +198,7 @@ class LexerTest extends TestCase
 
           $lexer = new Lexer();
           $tokens = $lexer->tokenize($template);
-          $this->expect($tokens[1]->getType())->toEqual(Token::TYPE_TEXT);
-          $this->expect($tokens[1]->getValue())->toEqual(". Whoop");
+          $this->expect($tokens[0]->getType())->toEqual(Token::TYPE_TEXT);
+          $this->expect($tokens[0]->getValue())->toEqual(". Whoop");
     }
 }
