@@ -78,8 +78,9 @@ class Lexer
           $this->pushToken(Token::TYPE_VARIABLE_START);
           $this->setState(self::STATE_VARIABLE);
           $this->processVariable();
-        } else {
-          $this->endIt();
+        } elseif ($currentPosition[0] == "{#") {
+          preg_match("~.*".preg_quote("#}")."~A", $this->template, $matches, null, $this->cursor);
+          $this->moveCursor($matches[0]);
         }
 
 

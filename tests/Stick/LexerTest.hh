@@ -193,4 +193,14 @@ class LexerTest extends TestCase
         $this->expect($tokens[15]->getType())->toEqual(Token::TYPE_TEXT);
         $this->expect($tokens[15]->getValue())->toEqual(". Whoop");
     }
+
+    public function testIgnoresCommentAndReturnsText(): void
+    {
+          $template = "{# Test comment #}. Whoop";
+
+          $lexer = new Lexer();
+          $tokens = $lexer->tokenize($template);
+          $this->expect($tokens[1]->getType())->toEqual(Token::TYPE_TEXT);
+          $this->expect($tokens[1]->getValue())->toEqual(". Whoop");
+    }
 }
