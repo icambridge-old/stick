@@ -162,34 +162,32 @@ class LexerTest extends TestCase
 
     public function testReturnsNameTokenEndFor(): void
     {
-        $startString = "Hello World";
-        $template = "$startString{% for var in array %}Hello {{ var }} {% endfor %}. Whoop";
+        $template = "{% for var in array %}Hello {{ var }} {% endfor %}. Whoop";
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[13]->getType())->toEqual(Token::TYPE_NAME);
-        $this->expect($tokens[13]->getValue())->toEqual("endfor");
+        $this->expect($tokens[12]->getType())->toEqual(Token::TYPE_NAME);
+        $this->expect($tokens[12]->getValue())->toEqual("endfor");
     }
 
     public function testReturnsEndBlockAfterText(): void
     {
-        $startString = "Hello World";
-        $template = "$startString{% for var in array %}Hello {{ var }} {% endfor %}. Whoop";
+        $template = "{% for var in array %}Hello {{ var }} {% endfor %}. Whoop";
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[14]->getType())->toEqual(Token::TYPE_BLOCK_END);
+        $this->expect($tokens[13]->getType())->toEqual(Token::TYPE_BLOCK_END);
     }
 
     public function testReturnsLastText(): void
     {
         $startString = "Hello World";
-        $template = "$startString{% for var in array %}Hello {{ var }} {% endfor %}. Whoop";
+        $template = "{% for var in array %}Hello {{ var }} {% endfor %}. Whoop";
 
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($template);
-        $this->expect($tokens[15]->getType())->toEqual(Token::TYPE_TEXT);
-        $this->expect($tokens[15]->getValue())->toEqual(". Whoop");
+        $this->expect($tokens[14]->getType())->toEqual(Token::TYPE_TEXT);
+        $this->expect($tokens[14]->getValue())->toEqual(". Whoop");
     }
 
     public function testIgnoresCommentAndReturnsText(): void
