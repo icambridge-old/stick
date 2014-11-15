@@ -24,7 +24,7 @@ class Lexer
     }
 
     public function process(string $template) {
-        $regex = '/('.preg_quote('{{', '/').'|'.preg_quote('{%', '/').'|'.preg_quote('{#', '/').')/s';
+        $regex = '~('.preg_quote('{{', '/').'|'.preg_quote('{%', '/').'|'.preg_quote('{#', '/').')~s';
         preg_match_all($regex, $template, $matches, PREG_OFFSET_CAPTURE);
 
         $this->positions = $matches;
@@ -45,6 +45,10 @@ class Lexer
 
 
         } while ($this->cursor < $this->end);
+
+        if ($this->state != self::STATE_DATA) {
+            throw new Exception\InvalidSyntax("Unended block");
+        }
 
 
         return $this->tokens;
@@ -81,7 +85,9 @@ class Lexer
           $this->setState(self::STATE_VARIABLE);
           $this->processVariable();
         } elseif ($currentPosition[0] == "{#") {
-          preg_match("~.*".preg_quote("#}")."~A", $this->template, $matches, null, $this->cursor);
+          if (!preg_match("~.*".preg_quote("#}")."~A", $this->template, $matches, null, $this->cursor)) {
+              throw new Exception\InvalidSyntax("Unfinished comment");
+          }
           $this->moveCursor($matches[0]);
         }
 
@@ -135,6 +141,10 @@ class Lexer
     {
       if (preg_match('/\s+/A', $this->template, $match, null, $this->cursor)) {
         $this->moveCursor($match[0]);
+
+        if ($this->cursor >= $this->end) {
+          throw new Exception\InvalidSyntax("Missing %}");
+        }
       }
     }
 

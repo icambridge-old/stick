@@ -199,4 +199,34 @@ class LexerTest extends TestCase
           $this->expect($tokens[0]->getType())->toEqual(Token::TYPE_TEXT);
           $this->expect($tokens[0]->getValue())->toEqual(". Whoop");
     }
+
+    public function testThrowsExceptionWhenCommentNotEnded(): void
+    {
+        $template = "{# stuff here";
+
+        $lexer = new Lexer();
+        $this->expectCallable(() ==> {$lexer->tokenize($template);})->toThrow("Stick\\Exception\\InvalidSyntax");
+    }
+
+    public function testThrowsExceptionWhenBlockNotEndedSpace(): void
+    {
+        $template = "{% dsfjalkds ";
+
+        $lexer = new Lexer();
+        $this->expectCallable(() ==> {$lexer->tokenize($template);})->toThrow("Stick\\Exception\\InvalidSyntax");
+    }
+
+    public function testThrowsExceptionWhenBlockNotEnded(): void
+    {
+        $template = "{% dsfjalkds";
+        $lexer = new Lexer();
+        $this->expectCallable(() ==> {$lexer->tokenize($template);})->toThrow("Stick\\Exception\\InvalidSyntax");
+    }
+
+    public function testThrowsExceptionWhenVariableNotEnded(): void
+    {
+      $template = "{{ dsfjalkds";
+      $lexer = new Lexer();
+      $this->expectCallable(() ==> {$lexer->tokenize($template);})->toThrow("Stick\\Exception\\InvalidSyntax");
+    }
 }
