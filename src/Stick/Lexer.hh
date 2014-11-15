@@ -1,6 +1,6 @@
 <?hh //strict
 
-namespace Iain\Framework\Template;
+namespace Stick;
 
 class Lexer
 {

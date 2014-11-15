@@ -1,6 +1,6 @@
 <?hh
 
-namespace Iain\Framework\Template;
+namespace Stick;
 
 use HackPack\HackUnit\Core\Expectation;
 use HackPack\HackUnit\Core\TestCase;
