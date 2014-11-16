@@ -8,6 +8,13 @@ class Lexer
     const STATE_BLOCK = 1;
     const STATE_VARIABLE = 2;
 
+    const TAG_BLOCK_OPEN = '{%';
+    const TAG_BLOCK_CLOSE = '%}';
+    const TAG_COMMENT_OPEN = '{#';
+    const TAG_COMMENT_CLOSE = '#}';
+    const TAG_VARIABLE_OPEN = '{{';
+    const TAG_VARIABLE_CLOSE = '}}';
+
 
     private string $template;
     private int $cursor = 0;
@@ -24,8 +31,11 @@ class Lexer
     }
 
     public function process(string $template) {
-        $regex = '~('.preg_quote('{{', '/').'|'.preg_quote('{%', '/').'|'.preg_quote('{#', '/').')~s';
-        preg_match_all($regex, $template, $matches, PREG_OFFSET_CAPTURE);
+        $tagOpenRegex = '~('.preg_quote(self::TAG_VARIABLE_OPEN, '/') .
+                 '|'.preg_quote(self::TAG_BLOCK_OPEN, '/') .
+                 '|'.preg_quote(self::TAG_COMMENT_OPEN, '/') .')~s';
+
+        preg_match_all($tagOpenRegex, $template, $matches, PREG_OFFSET_CAPTURE);
 
         $this->positions = $matches;
         $this->end = strlen($template);
@@ -74,16 +84,16 @@ class Lexer
 
         $this->moveCursor($text.$currentPosition[0]);
 
-        if ($currentPosition[0] == '{%') {
+        if ($currentPosition[0] == self::TAG_BLOCK_OPEN) {
           $this->pushToken(Token::TYPE_BLOCK_START);
           $this->setState(self::STATE_BLOCK);
           $this->processBlock();
-        } elseif ($currentPosition[0] == "{{") {
+        } elseif ($currentPosition[0] == self::TAG_VARIABLE_OPEN) {
           $this->pushToken(Token::TYPE_VARIABLE_START);
           $this->setState(self::STATE_VARIABLE);
           $this->processVariable();
-        } elseif ($currentPosition[0] == "{#") {
-          if (!preg_match("~.*".preg_quote("#}")."~A", $this->template, $matches, null, $this->cursor)) {
+        } elseif ($currentPosition[0] == self::TAG_COMMENT_OPEN) {
+          if (!preg_match("~.*".preg_quote(self::TAG_COMMENT_CLOSE)."~A", $this->template, $matches, null, $this->cursor)) {
               throw new Exception\InvalidSyntax("Unfinished comment");
           }
           $this->moveCursor($matches[0]);
@@ -98,7 +108,7 @@ class Lexer
 
     private function processBlock(): void
     {
-        $regexBlockEnd = "~".preg_quote("%}")."~A";
+        $regexBlockEnd = "~".preg_quote(self::TAG_BLOCK_CLOSE)."~A";
         if (preg_match($regexBlockEnd, $this->template, $match, null, $this->cursor)) {
           $this->pushToken(Token::TYPE_BLOCK_END);
           $this->moveCursor($match[0]);
@@ -110,7 +120,7 @@ class Lexer
 
     private function processVariable(): void
     {
-        $regexBlockEnd = "~".preg_quote("}}")."~A";
+        $regexBlockEnd = "~".preg_quote(self::TAG_VARIABLE_CLOSE)."~A";
         if (preg_match($regexBlockEnd, $this->template, $match, null, $this->cursor)) {
           $this->pushToken(Token::TYPE_VARIABLE_END);
           $this->moveCursor($match[0]);
