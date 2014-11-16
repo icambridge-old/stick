@@ -4,7 +4,7 @@ namespace Stick;
 
 class Lexer
 {
-    const STATE_DATA = 0;
+    const STATE_TEXT = 0;
     const STATE_BLOCK = 1;
     const STATE_VARIABLE = 2;
 
@@ -32,8 +32,8 @@ class Lexer
 
         do {
           switch ($this->state){
-            case self::STATE_DATA:
-              $this->processData();
+            case self::STATE_TEXT:
+              $this->processText();
               break;
             case self::STATE_BLOCK:
               $this->processBlock();
@@ -46,7 +46,7 @@ class Lexer
 
         } while ($this->cursor < $this->end);
 
-        if ($this->state != self::STATE_DATA) {
+        if ($this->state != self::STATE_TEXT) {
             throw new Exception\InvalidSyntax("Unended block");
         }
 
@@ -54,7 +54,7 @@ class Lexer
         return $this->tokens;
     }
 
-    private function processData()
+    private function processText()
     {
        if ($this->position == count($this->positions[0]) - 1) {
             $string = substr($this->template, $this->cursor);
@@ -104,7 +104,7 @@ class Lexer
         if (preg_match($regexBlockEnd, $this->template, $match, null, $this->cursor)) {
           $this->pushToken(Token::TYPE_BLOCK_END);
           $this->moveCursor($match[0]);
-          $this->setState(self::STATE_DATA);
+          $this->setState(self::STATE_TEXT);
         } else {
           $this->processExpression();
         }
@@ -116,7 +116,7 @@ class Lexer
         if (preg_match($regexBlockEnd, $this->template, $match, null, $this->cursor)) {
           $this->pushToken(Token::TYPE_VARIABLE_END);
           $this->moveCursor($match[0]);
-          $this->setState(self::STATE_DATA);
+          $this->setState(self::STATE_TEXT);
         } else {
           $this->processExpression();
         }
