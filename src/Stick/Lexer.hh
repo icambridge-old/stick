@@ -67,10 +67,8 @@ class Lexer
         $currentPosition = $this->positions[0][$this->position];
 
         // push the template text first
-        $rawText = $text = substr($this->template, $this->cursor, $currentPosition[1] - $this->cursor);
-        if (isset($this->positions[2][$this->position][0])) {
-            $text = rtrim($rawText);
-        }
+        $text = substr($this->template, $this->cursor, $currentPosition[1] - $this->cursor);
+
 
         $this->pushToken(Token::TYPE_TEXT, $text);
 
