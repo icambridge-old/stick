@@ -4,7 +4,7 @@ namespace Stick\Node;
 
 abstract class Node
 {
-  protected array<Base> $nodes;
+  protected array<Node> $nodes = [];
 
   public function getChildren(): array<Node> {
     return $this->nodes;

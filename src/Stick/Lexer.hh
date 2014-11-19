@@ -16,26 +16,27 @@ class Lexer
     const TAG_VARIABLE_CLOSE = '}}';
 
 
-    private string $template;
+    private string $template = "";
+    private int $end = 0;
     private int $cursor = 0;
     private int $position = -1;
     private int $state = 0;
-    private array $positons = [];
-    private array $tokens = [];
+    private array<array<string>> $positions = [];
+    private array<Token> $tokens = [];
 
-    public function tokenize(string $template): array {
+    public function tokenize(string $template): array<Token> {
         $this->template = $template;
         $this->process($template);
         $this->tokens[] = new Token(Token::TYPE_EOF, '');
         return $this->tokens;
     }
 
-    public function process(string $template) {
+    public function process(string $template): array<Token> {
         $tagOpenRegex = '~('.preg_quote(self::TAG_VARIABLE_OPEN, '/') .
                  '|'.preg_quote(self::TAG_BLOCK_OPEN, '/') .
                  '|'.preg_quote(self::TAG_COMMENT_OPEN, '/') .')~s';
-
-        preg_match_all($tagOpenRegex, $template, $matches, PREG_OFFSET_CAPTURE);
+        $matches = [];
+        preg_match_all($tagOpenRegex, $template, $matches, \PREG_OFFSET_CAPTURE);
 
         $this->positions = $matches;
         $this->end = strlen($template);
@@ -64,7 +65,7 @@ class Lexer
         return $this->tokens;
     }
 
-    private function processText()
+    private function processText(): void
     {
        if ($this->position == count($this->positions[0]) - 1) {
             $string = substr($this->template, $this->cursor);
@@ -77,7 +78,7 @@ class Lexer
         $currentPosition = $this->positions[0][$this->position];
 
         // push the template text first
-        $text = substr($this->template, $this->cursor, $currentPosition[1] - $this->cursor);
+        $text = substr($this->template, $this->cursor, intval($currentPosition[1]) - $this->cursor);
 
 
         $this->pushToken(Token::TYPE_TEXT, $text);
@@ -93,6 +94,7 @@ class Lexer
           $this->setState(self::STATE_VARIABLE);
           $this->processVariable();
         } elseif ($currentPosition[0] == self::TAG_COMMENT_OPEN) {
+          $matches = [];
           if (!preg_match("~.*".preg_quote(self::TAG_COMMENT_CLOSE)."~A", $this->template, $matches, null, $this->cursor)) {
               throw new Exception\InvalidSyntax("Unfinished comment");
           }
@@ -108,6 +110,7 @@ class Lexer
 
     private function processBlock(): void
     {
+        $match = [];
         $regexBlockEnd = "~".preg_quote(self::TAG_BLOCK_CLOSE)."~A";
         if (preg_match($regexBlockEnd, $this->template, $match, null, $this->cursor)) {
           $this->pushToken(Token::TYPE_BLOCK_END);
@@ -121,6 +124,7 @@ class Lexer
     private function processVariable(): void
     {
         $regexBlockEnd = "~".preg_quote(self::TAG_VARIABLE_CLOSE)."~A";
+        $match = [];
         if (preg_match($regexBlockEnd, $this->template, $match, null, $this->cursor)) {
           $this->pushToken(Token::TYPE_VARIABLE_END);
           $this->moveCursor($match[0]);
@@ -136,6 +140,7 @@ class Lexer
         $regexName = "~[a-z0-9_][a-z0-9_]*~A";
 
         $this->ignoreWhitespace();
+        $match = [];
         if (preg_match('~in~iA', $this->template, $match, null, $this->cursor)) {
           $this->pushToken(Token::TYPE_OPERATOR, $match[0]);
           $this->moveCursor($match[0]);
@@ -147,6 +152,7 @@ class Lexer
 
     private function ignoreWhitespace(): void
     {
+      $match = [];
       if (preg_match('/\s+/A', $this->template, $match, null, $this->cursor)) {
         $this->moveCursor($match[0]);
 
@@ -169,7 +175,7 @@ class Lexer
 
     private function pushToken(string $type, string $text = ''): void
     {
-        if (empty($text) && Token::TYPE_TEXT == $type) {
+        if ($text == "" && Token::TYPE_TEXT == $type) {
           return;
         }
 

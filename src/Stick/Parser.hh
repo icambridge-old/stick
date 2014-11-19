@@ -5,9 +5,9 @@ namespace Stick;
 class Parser
 {
     private int $counter = 0;
-    private array<Token> $tokens;
+    private array<Token> $tokens = [];
 
-    public function parse(array<Token> $tokens): array
+    public function parse(array<Token> $tokens): array<Node\Node>
     {
       $output = [];
       $this->tokens = $tokens;
@@ -18,6 +18,7 @@ class Parser
             break;
           case Token::TYPE_VARIABLE_START:
             $output[] = $this->generateVariableNode($token);
+            break;
           default:
             break;
         }
@@ -34,7 +35,7 @@ class Parser
     // TODO Move to collection
     private function getNextToken(): ?Token
     {
-      if (!isset($this->tokens[$this->counter])) {
+      if (!array_key_exists($this->counter ,$this->tokens)) {
         return null;
       }
 
