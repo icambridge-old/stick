@@ -19,12 +19,20 @@ class Parser
           case Token::TYPE_VARIABLE_START:
             $output[] = $this->generateVariableNode($token);
             break;
+          case Token::TYPE_BLOCK_START:
+            $output[] = $this->generateBlockNode($token);
+            break;
           default:
             break;
         }
       }
 
       return $output;
+    }
+
+    public function generateBlockNode(Token $token): Node\Node
+    {
+      return new Node\ForLoop();
     }
 
     public function generateVariableNode(Token $token): Node\Node
