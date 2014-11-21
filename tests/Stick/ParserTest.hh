@@ -61,4 +61,5 @@ class ParserTest extends TestCase
     $nodes = $parser->parse($tokens);
     $this->expect(is_a($nodes[0], '\\Stick\\Node\\ForLoop'))->toEqual(true);
   }
+
 }
