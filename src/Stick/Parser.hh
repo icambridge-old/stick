@@ -2,6 +2,8 @@
 
 namespace Stick;
 
+use Stick\Exception\InvalidSyntax;
+
 class Parser
 {
     private int $counter = 0;
@@ -28,9 +30,7 @@ class Parser
                 $this->currentNode->addNode($this->generateVariableNode($token));
                 break;
               case Token::TYPE_BLOCK_START:
-                $blockNode = $this->generateBlockNode();
-                $this->currentNode->addNode($blockNode);
-                $this->currentNode = $blockNode;
+                $this->generateBlockNode();
                 break;
               default:
                 break;
@@ -41,12 +41,74 @@ class Parser
       return $this->baseNode;
     }
 
-    private function generateBlockNode(): Node\Node
+    private function endBlock($token): void
     {
-        $parser = new Parser\Block();
-        $node = $parser->parse($this->tokens);
+        $endBlock = $this->tokens->getNext();
+        if (!$endBlock->isEndBlock()) {
+            $exceptionMessage = sprintf("excepted end of block not %s", $endBlock->getType());
+            throw new InvalidSyntax($exceptionMessage);
+        }
 
-        return $node;
+        if (!$this->currentNode->isBlockEnd($token)) {
+            throw new InvalidSyntax("Not correct block ending");
+        }
+
+        $currentNode = $this->currentNode->getParent();
+        $this->currentNode = $currentNode;
+    }
+
+    // TODO refactor out into seperate class. Again.
+    private function startBlock(): void
+    {
+        $value = $this->tokens->getNext();
+
+        if (!$value->isName()) {
+            $exceptionMessage = sprintf("excepted value name not %s", $value->getType());
+            throw new InvalidSyntax($exceptionMessage);
+        }
+
+        $operator = $this->tokens->getNext();
+
+        if (!$operator->isOperator()) {
+            $exceptionMessage = sprintf("excepted operator not %s", $operator->getType());
+            throw new InvalidSyntax($exceptionMessage);
+        }
+
+        $array = $this->tokens->getNext();
+
+        if (!$array->isName()) {
+            $exceptionMessage = sprintf("excepted array not %s", $array->getType());
+            throw new InvalidSyntax($exceptionMessage);
+        }
+
+        $endBlock = $this->tokens->getNext();
+        if (!$endBlock->isEndBlock()) {
+            $exceptionMessage = sprintf("excepted end of block not %s", $endBlock->getType());
+            throw new InvalidSyntax($exceptionMessage);
+        }
+
+        $node =  new Node\ForLoop($array, $value);
+        $this->currentNode->addNode($node);
+        $this->currentNode = $node;
+    }
+
+    private function generateBlockNode(): void
+    {
+        $blockName = $this->tokens->getNext();
+
+
+        if (!$this->isStartNode($blockName) && !$this->isEndNode($blockName)) {
+            $exceptionMessage = sprintf("'%s' isn't a valid block name", $blockName->getValue());
+            throw new InvalidSyntax($exceptionMessage);
+        }
+
+        if ($this->isStartNode($blockName)) {
+            return $this->startBlock();
+        }
+
+        if ($this->isEndNode($blockName)) {
+            return $this->endBlock($blockName);
+        }
     }
 
     private function generateVariableNode(Token $token): Node\Node
@@ -54,13 +116,16 @@ class Parser
       return new Node\Write(new Node\Variable());
     }
 
-    // TODO Move to collection
-    private function getNextToken(): ?Token
+    // TODO move to dependency
+    private function isStartNode($token): bool
     {
-      if (!array_key_exists($this->counter ,$this->tokens)) {
-        return null;
-      }
+        $vector = Vector{"for"};
+        return ($vector->linearSearch($token->getValue()) !== -1);
+    }
 
-      return $this->tokens[$this->counter++];
+    private function isEndNode($token): bool
+    {
+        $vector = Vector{"endfor", "endif"};
+        return ($vector->linearSearch($token->getValue()) !== -1);
     }
 }
