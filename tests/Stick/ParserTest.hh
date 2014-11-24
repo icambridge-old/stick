@@ -55,6 +55,9 @@ class ParserTest extends TestCase
     $tokens->add(new Token(Token::TYPE_OPERATOR, "in"));
     $tokens->add(new Token(Token::TYPE_NAME, "array"));
     $tokens->add(new Token(Token::TYPE_BLOCK_END, ""));
+    $tokens->add(new Token(Token::TYPE_BLOCK_START, ""));
+    $tokens->add(new Token(Token::TYPE_NAME, "endfor"));
+    $tokens->add(new Token(Token::TYPE_BLOCK_END, ""));
     $tokens->add(new Token(Token::TYPE_EOF, ""));
 
     $parser = new Parser();
@@ -101,9 +104,26 @@ class ParserTest extends TestCase
 
       $parser = new Parser();
       $this->expectCallable(
-            () ==> {$parser->parse($tokens)->getChildren();}
+            () ==> {$parser->parse($tokens);}
         )->toThrow("Stick\\Exception\\InvalidSyntax");
 
+  }
+
+  public function testThrowsExceptionIfBlockIsntClosed(): void {
+
+      $tokens = new TokenCollection();
+      $tokens->add(new Token(Token::TYPE_BLOCK_START, ""));
+      $tokens->add(new Token(Token::TYPE_NAME, "for"));
+      $tokens->add(new Token(Token::TYPE_NAME, "var"));
+      $tokens->add(new Token(Token::TYPE_OPERATOR, "in"));
+      $tokens->add(new Token(Token::TYPE_NAME, "array"));
+      $tokens->add(new Token(Token::TYPE_BLOCK_END, ""));
+      $tokens->add(new Token(Token::TYPE_EOF, ""));
+
+      $parser = new Parser();
+      $this->expectCallable(
+        () ==> {$parser->parse($tokens);}
+      )->toThrow("Stick\\Exception\\InvalidSyntax");
   }
 
 }

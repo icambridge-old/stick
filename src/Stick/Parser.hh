@@ -38,6 +38,11 @@ class Parser
         $token = $tokens->getNext();
       } while ($token->getType() != Token::TYPE_EOF);
 
+      if ($this->currentNode !== $this->baseNode) {
+          // TODO which block it is to $this->currentNode;
+          throw new InvalidSyntax("Didn't close block");
+      }
+
       return $this->baseNode;
     }
 
@@ -58,6 +63,7 @@ class Parser
     }
 
     // TODO refactor out into seperate class. Again.
+    // TOOD Factory
     private function startBlock(): void
     {
         $value = $this->tokens->getNext();
