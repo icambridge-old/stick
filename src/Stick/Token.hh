@@ -22,4 +22,20 @@ class Token
     public function getValue(): string {
         return $this->value;
     }
+
+    public funciton isName(): bool {
+            return $this->type == self::TYPE_NAME;
+    }
+
+    public function isOperator(): bool {
+        return $this->type == self::TYPE_NAME;
+    }
+
+    public function isStartBlock() bool {
+        return $this->type == self::TYPE_BLOCK_START;
+    }
+
+    public function isEndBlock(): bool {
+        return $this->type == self::TYPE_BLOCK_END;
+    }
 }

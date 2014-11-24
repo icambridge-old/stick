@@ -4,9 +4,13 @@ namespace Stick\Node;
 
 abstract class Node
 {
-  protected array<Node> $nodes = [];
+    protected Vector<Node> $nodes = [];
 
-  public function getChildren(): array<Node> {
-    return $this->nodes;
-  }
+    public function addNode(Node $node): void {
+        $this->nodes[] = $node;
+    }
+
+    public function getChildren(): Vector<Node> {
+        return $this->nodes;
+    }
 }

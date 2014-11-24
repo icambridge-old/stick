@@ -6,6 +6,13 @@ class Parser
 {
     private int $counter = 0;
     private array<Token> $tokens = [];
+    private Node $baseNode;
+    private Node $currentNode;
+
+    public function __construct() : void
+    {
+        $this->currentNode = $this->baseName = new Node\Base();
+    }
 
     public function parse(array<Token> $tokens): array<Node\Node>
     {
@@ -32,7 +39,9 @@ class Parser
 
     public function generateBlockNode(Token $token): Node\Node
     {
-      return new Node\ForLoop();
+        $node = new Node\ForLoop();
+
+        return $node;
     }
 
     public function generateVariableNode(Token $token): Node\Node
