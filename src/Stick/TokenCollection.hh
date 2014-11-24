@@ -13,7 +13,7 @@ class TokenCollection
         $this->tokens[] = $token;
     }
 
-    public function next(): void
+    public function getNext(): void
     {
         return $this->tokens[$this->counter++];
     }

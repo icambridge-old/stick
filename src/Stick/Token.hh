@@ -23,15 +23,15 @@ class Token
         return $this->value;
     }
 
-    public funciton isName(): bool {
-            return $this->type == self::TYPE_NAME;
-    }
-
-    public function isOperator(): bool {
+    public function isName(): bool {
         return $this->type == self::TYPE_NAME;
     }
 
-    public function isStartBlock() bool {
+    public function isOperator(): bool {
+        return $this->type == self::TYPE_OPERATOR;
+    }
+
+    public function isStartBlock(): bool {
         return $this->type == self::TYPE_BLOCK_START;
     }
 
