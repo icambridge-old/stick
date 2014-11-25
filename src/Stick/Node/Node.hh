@@ -3,6 +3,7 @@
 namespace Stick\Node;
 
 use Stick\VariableContainer;
+use Stick\Token;
 
 abstract class Node
 {
