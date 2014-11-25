@@ -2,6 +2,8 @@
 
 namespace Stick\Node;
 
+use Stick\VariableContainer;
+
 abstract class Node
 {
     protected Vector<Node> $nodes = Vector{};
@@ -20,6 +22,10 @@ abstract class Node
         return $this->parent;
     }
 
+    public function compile(VariableContainer $container): string {
+        return "";
+    }
+
     public function addNode(Node $node): void {
         $node->addParent($this);
         $this->nodes[] = $node;
@@ -28,7 +34,7 @@ abstract class Node
     public function getChildren(): Vector<Node> {
         return $this->nodes;
     }
-    
+
     public function isBlockEnd(Token $token) : bool
     {
         return false;

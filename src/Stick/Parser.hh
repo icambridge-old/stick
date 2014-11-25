@@ -119,7 +119,20 @@ class Parser
 
     private function generateVariableNode(Token $token): Node\Node
     {
-      return new Node\Write(new Node\Variable());
+        $name = $this->tokens->getNext();
+        if (!$name->isName()) {
+            $exceptionMessage = sprintf("excepted value name not %s", $value->getType());
+            throw new InvalidSyntax($exceptionMessage);
+        }
+
+        $variableEnd = $this->tokens->getNext();
+        if (!$variableEnd->isVariableEnd()) {
+            $exceptionMessage = sprintf("excepted variable end %s", $value->getType());
+            throw new InvalidSyntax($exceptionMessage);
+        }
+
+
+        return new Node\Write(new Node\Variable($name));
     }
 
     // TODO move to dependency

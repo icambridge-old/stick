@@ -38,4 +38,9 @@ class Token
     public function isEndBlock(): bool {
         return $this->type == self::TYPE_BLOCK_END;
     }
+
+    public function isVariableEnd() : bool
+    {
+        return $this->type == self::TYPE_VARIABLE_END;
+    }
 }
